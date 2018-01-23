@@ -68,7 +68,7 @@ Those file are include as submodule in this repository.
 
 ```
 $ git submodule init
-$ git submodule update xnu/< %your macOS version, eg: 10.13% >
+$ git submodule update darwin-xnu/< %your macOS version, eg: 10.13% >
 
 ```
 

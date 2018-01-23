@@ -18,7 +18,7 @@ ifeq ($(OS), Darwin)
 override CFLAGS +=-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib
 SHELL := /bin/bash
 OSX_VERSION := $(shell sw_vers -productVersion | cut -d '.' -f 1,2)
-OSX_ROOT_PATH := xnu
+OSX_ROOT_PATH := darwin-xnu
 OSX_HEADERS_PATH := $(OSX_ROOT_PATH)/$(OSX_VERSION)
 override CFLAGS +=-I$(OSX_HEADERS_PATH)/bsd -I$(OSX_HEADERS_PATH)/libkern
 endif
