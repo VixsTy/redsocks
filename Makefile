@@ -20,8 +20,7 @@ SHELL := /bin/bash
 OSX_VERSION := $(shell sw_vers -productVersion | cut -d '.' -f 1,2)
 OSX_ROOT_PATH := xnu
 OSX_HEADERS_PATH := $(OSX_ROOT_PATH)/$(OSX_VERSION)
-OSX_HEADERS := $(OSX_HEADERS_PATH)/net/pfvar.h $(OSX_HEADERS_PATH)/net/radix.h $(OSX_HEADERS_PATH)/libkern/tree.h
-override CFLAGS +=-I$(OSX_HEADERS_PATH)
+override CFLAGS +=-I$(OSX_HEADERS_PATH)/bsd -I$(OSX_HEADERS_PATH)/libkern
 endif
 
 
@@ -98,16 +97,7 @@ gen/.build:
 
 base.c: $(CONF)
 
-# ifeq ($(OS), Darwin)
-# $(OSX_HEADERS_PATH)/net/pfvar.h:
-# 	mkdir -p $(OSX_HEADERS_PATH)/net && curl -o $(OSX_HEADERS_PATH)/net/pfvar.h https://raw.githubusercontent.com/opensource-apple/xnu/$(OSX_VERSION)/bsd/net/pfvar.h
-# $(OSX_HEADERS_PATH)/net/radix.h:
-# 	mkdir -p $(OSX_HEADERS_PATH)/net && curl -o $(OSX_HEADERS_PATH)/net/radix.h https://raw.githubusercontent.com/opensource-apple/xnu/$(OSX_VERSION)/bsd/net/radix.h
-# $(OSX_HEADERS_PATH)/libkern/tree.h:
-# 	mkdir -p $(OSX_HEADERS_PATH)/libkern && curl -o $(OSX_HEADERS_PATH)/libkern/tree.h https://raw.githubusercontent.com/opensource-apple/xnu/$(OSX_VERSION)/libkern/libkern/tree.h
-# endif
-
-$(DEPS): $(OSX_HEADERS) $(SRCS)
+$(DEPS): $(SRCS)
 	$(CC) -MM $(CFLAGS) $(SRCS) 2>/dev/null >$(DEPS) || \
 	( \
 		for I in $(wildcard *.h); do \
@@ -142,4 +132,3 @@ distclean: clean
 	$(RM) $(OUT)
 	$(RM) tags $(DEPS)
 	$(RM) -r gen
-	$(RM) -r $(OSX_ROOT_PATH)
