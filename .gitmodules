@@ -1,9 +1,9 @@
 [submodule "darwin-xnu/10.13"]
-	path = darwin-xnu/xnu/10.13
+	path = darwin-xnu/10.13
 	url = git@github.com:apple/darwin-xnu.git
 [submodule "darwin-xnu/10.12"]
-	path = darwin-xnu/xnu/10.12
+	path = darwin-xnu/10.12
 	url = git@github.com:apple/darwin-xnu.git
 [submodule "darwin-xnu/10.11"]
-	path = darwin-xnu/xnu/10.11
+	path = darwin-xnu/10.11
 	url = git@github.com:apple/darwin-xnu.git
