@@ -191,9 +191,14 @@ static int getdestaddr_pf(
 	char clientaddr_str[INET6_ADDRSTRLEN], bindaddr_str[INET6_ADDRSTRLEN];
 
 	memset(&nl, 0, sizeof(struct pfioc_natlook));
+#ifdef OSX10.13
 	nl.saddr.v4addr.s_addr = client->sin_addr.s_addr;
-	nl.sport = client->sin_port;
 	nl.daddr.v4addr.s_addr = bindaddr->sin_addr.s_addr;
+#else
+	nl.saddr.v4.s_addr = client->sin_addr.s_addr;
+	nl.daddr.v4.s_addr = bindaddr->sin_addr.s_addr;
+#endif
+	nl.sport = client->sin_port;
 	nl.dport = bindaddr->sin_port;
 	nl.af = AF_INET;
 	nl.proto = IPPROTO_TCP;
@@ -212,7 +217,11 @@ static int getdestaddr_pf(
 	}
 	destaddr->sin_family = AF_INET;
 	destaddr->sin_port = nl.rdport;
+#ifdef OSX10.13
 	destaddr->sin_addr = nl.rdaddr.v4addr;
+#else
+	destaddr->sin_addr = nl.rdaddr.v4;
+#endif
 	return 0;
 
 fail:
