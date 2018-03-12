@@ -1,0 +1,18 @@
+language: c
+
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode9.3beta
+    - os: osx
+      osx_image: xcode9.2
+    - os: osx
+      osx_image: xcode8
+
+before_install:
+  - brew update
+  - brew install openssl
+  - brew install libevent
+
+script:
+  - make
