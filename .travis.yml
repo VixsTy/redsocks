@@ -16,3 +16,14 @@ before_install:
 
 script:
   - make
+
+deploy:
+  provider: releases
+  api_key: "b62932437283f44aef283c83a617b66c61c85ca4"
+  file:
+    - "redsocks2"
+    - "debian/redsocks.8"
+    - "darwin-xnu/redsocks.conf"
+  skip_cleanup: true
+  on:
+    tags: true
