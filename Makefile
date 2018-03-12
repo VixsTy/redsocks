@@ -20,6 +20,13 @@ SHELL := /bin/bash
 OSX_VERSION := $(shell sw_vers -productVersion | cut -d '.' -f 1,2)
 OSX_ROOT_PATH := darwin-xnu
 OSX_HEADERS_PATH := $(OSX_ROOT_PATH)/$(OSX_VERSION)
+
+ifeq ($(OSX_VERSION), 10.13)
+OSX_HEADERS_VERSION := _1013_EQUAL_OR_MORE_
+else
+OSX_HEADERS_VERSION := _1012_EQUAL_OR_LESS_
+endif
+
 override CFLAGS +=-I$(OSX_HEADERS_PATH)/bsd -I$(OSX_HEADERS_PATH)/libkern
 endif
 
@@ -66,7 +73,7 @@ $(CONF):
 		echo "#define USE_PF" >$(CONF) \
 		;; \
 	Darwin) \
-		echo -e "#define USE_PF\n#define _APPLE_\n#define _OSX$(OSX_VERSION)_" >$(CONF) \
+		echo -e "#define USE_PF\n#define _APPLE_\n#define $(OSX_HEADERS_VERSION)" >$(CONF) \
 		;; \
 	*) \
 		echo "Unknown system, only generic firewall code is compiled" 1>&2; \
