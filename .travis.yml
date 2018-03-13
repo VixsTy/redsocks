@@ -23,7 +23,7 @@ before_install:
 script:
 - make
 - mkdir -p deploy
-- tar -czf deploy/redsocks-macos-$BUILD_OS_VERSION.tar.gz redsocks2 debian/redsocks.8 darwin-xnu/redsocks.conf
+- tar -czf deploy/redsocks-$TRAVIS_TAG-$BUILD_OS_VERSION.bottle.tar.gz redsocks2 debian/redsocks.8 darwin-xnu/redsocks.conf
 
 deploy:
   provider: releases
