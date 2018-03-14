@@ -20,18 +20,36 @@ before_install:
 - brew install openssl
 - brew install libevent
 
-script:
-- make
-- mkdir -p deploy
-- tar -czf deploy/redsocks2-$TRAVIS_TAG.$BUILD_OS_VERSION.bottle.tar.gz redsocks2 debian/redsocks.8 darwin-xnu/redsocks.conf
 
-deploy:
-  provider: releases
-  api_key:
-    secure: RLj2Mh5/HwuTozWHkrzQLiGJs/PfMPQgkoH7nuoD/1fm1AvpuAKbhHtok2r4x9yTJ8rnkU5yOEG6gu7akEJCV8C+Cmy/VpA1nZa1ZyWoUeA2PfiAu4Vmv3es53ZB0AS4E95mTcPo8J3w40MRaiZPauzK9h2kXS3Hmg7V16ULHHFAZK+CS+4Vr/WthmHbYZjxtK8XN2ahnMt49bGuOyBflJy6rknJ+1DsOtVTHjVUPY0upGLc8MQQmhNFIv2s8dtx3CuhsTomg7gtAfvAIks1CFGLmPCMhIkcQrn+cdHEUZ9G6pthAr8sOwHLlz1/3uj7F0F875RBMlsRh69maPTMipX5wELt73FfiGEuRRxftfc2rPGNw+jJi7G45lqxkFWeVenfrel5J5oXHmJxCsnYbkUozUfhJTq2OCZcjR54elX4q9UNFfR/ksmm67qE7MkqmlBHvp1ZySk/fwp8qBsFztGDsPE2o6ClMwZC8nvYdFgLSlzD3U+lN65p/hOitoeudV5rZ83Ul52VPjbIy3U1Jze6WkkqmzUDkcRWyUJVFMrsPTF1k/sEcsBhOvXULtFaZXFY7RKg5hNfki7R/fcykKVsvv+vtTzJ9DSa97d1L/B6ZrU2SbJ8ecxz0Z6SAWytvvvJ0qo4tayIT9/9Ka9KmM7WhIVbwIuv9mg6LPOQfUg=
-  file_glob: true
-  file:
-    - "deploy/*"
-  skip_cleanup: true
-  on:
-    tags: true
+jobs:
+  include:
+    - stage: build
+      script:
+      - make
+    - stage: bottleit
+      if: tag IS present
+      env:
+        - REDSOCKS_FORMULA_FILE=redsocks2-${BUILD_OS_VERSION}.rb
+      script:
+      # - git config --global user.email "travis@travis-ci.org"
+      # - git config --global user.name "Travis CI"
+      # - git clone https://${GH_TOKEN}@github.com/VixsTy/homebrew-redsocks2.git homebrew-redsocks2
+      - mkdir -p build
+      - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
+      - cd build
+      - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
+      - brew bottle --merge --write ./${REDSOCKS_FORMULA_FILE}
+      # - git commit --message "Travis build $TRAVIS_BUILD_NUMBER"
+    - stage: deploy
+      if: tag IS present
+      script: skip
+      deploy:
+        provider: releases
+        api_key:
+          secure: RLj2Mh5/HwuTozWHkrzQLiGJs/PfMPQgkoH7nuoD/1fm1AvpuAKbhHtok2r4x9yTJ8rnkU5yOEG6gu7akEJCV8C+Cmy/VpA1nZa1ZyWoUeA2PfiAu4Vmv3es53ZB0AS4E95mTcPo8J3w40MRaiZPauzK9h2kXS3Hmg7V16ULHHFAZK+CS+4Vr/WthmHbYZjxtK8XN2ahnMt49bGuOyBflJy6rknJ+1DsOtVTHjVUPY0upGLc8MQQmhNFIv2s8dtx3CuhsTomg7gtAfvAIks1CFGLmPCMhIkcQrn+cdHEUZ9G6pthAr8sOwHLlz1/3uj7F0F875RBMlsRh69maPTMipX5wELt73FfiGEuRRxftfc2rPGNw+jJi7G45lqxkFWeVenfrel5J5oXHmJxCsnYbkUozUfhJTq2OCZcjR54elX4q9UNFfR/ksmm67qE7MkqmlBHvp1ZySk/fwp8qBsFztGDsPE2o6ClMwZC8nvYdFgLSlzD3U+lN65p/hOitoeudV5rZ83Ul52VPjbIy3U1Jze6WkkqmzUDkcRWyUJVFMrsPTF1k/sEcsBhOvXULtFaZXFY7RKg5hNfki7R/fcykKVsvv+vtTzJ9DSa97d1L/B6ZrU2SbJ8ecxz0Z6SAWytvvvJ0qo4tayIT9/9Ka9KmM7WhIVbwIuv9mg6LPOQfUg=
+        file_glob: true
+        file:
+          - "build/*"
+        skip_cleanup: true
+        on:
+          tags: true
