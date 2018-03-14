@@ -1,20 +1,5 @@
 language: c
 
-matrix:
-  include:
-  - os: osx
-    osx_image: xcode9.3beta
-    env:
-    - BUILD_OS_VERSION=high_sierra
-  - os: osx
-    osx_image: xcode9.2
-    env:
-    - BUILD_OS_VERSION=sierra
-  - os: osx
-    osx_image: xcode8
-    env:
-    - BUILD_OS_VERSION=el_capitan
-
 before_install:
 - brew update
 - brew install openssl
@@ -23,6 +8,18 @@ before_install:
 
 jobs:
   include:
+    - os: osx
+      osx_image: xcode9.3beta
+      env:
+      - BUILD_OS_VERSION=high_sierra
+    - os: osx
+      osx_image: xcode9.2
+      env:
+      - BUILD_OS_VERSION=sierra
+    - os: osx
+      osx_image: xcode8
+      env:
+      - BUILD_OS_VERSION=el_capitan
     - stage: build
       script:
       - make
