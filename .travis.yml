@@ -9,39 +9,45 @@ script:
 - make
 - make clean
 
+anchors:
+  - &run-high_sierra
+    os: osx
+    osx_image: xcode9.3beta
+    env:
+    - BUILD_OS_VERSION=high_sierra
+  - &run-sierra
+    os: osx
+    osx_image: xcode9.2
+    env:
+    - BUILD_OS_VERSION=sierra
+  - &run-el_capitan
+    os: osx
+    osx_image: xcode8
+    env:
+    - BUILD_OS_VERSION=el_capitan
+  - &bottleit
+    env:
+      - REDSOCKS_FORMULA_FILE=redsocks2-${BUILD_OS_VERSION}.rb
+    script:
+    - mkdir -p build
+    - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
+    - cd build
+    - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
+    - brew bottle --merge --write ./${REDSOCKS_FORMULA_FILE}
+
 jobs:
   include:
     - stage: build-high_sierra
-      &run-high_sierra
-      os: osx
-      osx_image: xcode9.3beta
-      env:
-      - BUILD_OS_VERSION=high_sierra
+      <<: *run-high_sierra
     - stage: build-sierra
-      &run-sierra
-      os: osx
-      osx_image: xcode9.2
-      env:
-      - BUILD_OS_VERSION=sierra
+      <<: *run-sierra
     - stage: build-el_capitan
-      &run-el_capitan
-      os: osx
-      osx_image: xcode8
-      env:
-      - BUILD_OS_VERSION=el_capitan
+      <<: *run-el_capitan
 
     - stage: bottleit-high_sierra
       if: tag IS present
       <<: *run-high_sierra
-      &bottleit
-      env:
-        - REDSOCKS_FORMULA_FILE=redsocks2-${BUILD_OS_VERSION}.rb
-      script:
-      - mkdir -p build
-      - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
-      - cd build
-      - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
-      - brew bottle --merge --write ./${REDSOCKS_FORMULA_FILE}
+      <<: *bottleit
     - stage: bottleit-sierra
       if: tag IS present
       <<: *run-sierra
