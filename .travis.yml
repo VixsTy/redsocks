@@ -29,28 +29,41 @@ anchors:
     - BUILD_OS_VERSION=el_capitan
     - REDSOCKS_FORMULA_FILE=redsocks2.rb
   - &bottleit
+    before_install:
+    # set up awscli packages
+    - pip install --user awscli
+    - mkdir -p build
+    - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
     script:
     - cd build
     - ls -lahR .
     - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
     - brew bottle --merge --write ./${REDSOCKS_FORMULA_FILE}
+    after_success:
+    - aws s3 sync build/ s3://travis-redsocks/$TRAVIS_BUILD_NUMBER
 
 jobs:
   include:
-    - stage: build-high_sierra
-      <<: *run-high_sierra
-    - stage: build-sierra
-      <<: *run-sierra
-    - stage: build-el_capitan
-      <<: *run-el_capitan
+    # - stage: build
+    #   <<: *run-high_sierra
+    # - stage: build
+    #   <<: *run-sierra
+    # - stage: build
+    #   <<: *run-el_capitan
 
     - stage: prepare-brew-formula
+      if: tag IS present
       env:
       - REDSOCKS_FORMULA_FILE=redsocks2.rb
-      before_install: skip
-      script:
+      before_install:
+      # set up awscli packages
+      - pip install --user awscli
       - mkdir -p build
+      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
+      script:
       - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
+      after_success:
+      - aws s3 sync build/ s3://travis-redsocks/$TRAVIS_BUILD_NUMBER
 
     - stage: bottleit-high_sierra
       if: tag IS present
