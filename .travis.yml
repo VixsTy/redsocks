@@ -5,38 +5,60 @@ before_install:
 - brew install openssl
 - brew install libevent
 
+script:
+- make
+- make clean
 
 jobs:
   include:
-    - os: osx
+    - &run-high_sierra
+      os: osx
       osx_image: xcode9.3beta
       env:
       - BUILD_OS_VERSION=high_sierra
-    - os: osx
+    - &run-sierra
+      os: osx
       osx_image: xcode9.2
       env:
       - BUILD_OS_VERSION=sierra
-    - os: osx
+    - &run-el_capitan
+      os: osx
       osx_image: xcode8
       env:
       - BUILD_OS_VERSION=el_capitan
-    - stage: build
-      script:
-      - make
-    - stage: bottleit
-      if: tag IS present
+    - &bottleit
       env:
         - REDSOCKS_FORMULA_FILE=redsocks2-${BUILD_OS_VERSION}.rb
       script:
-      # - git config --global user.email "travis@travis-ci.org"
-      # - git config --global user.name "Travis CI"
-      # - git clone https://${GH_TOKEN}@github.com/VixsTy/homebrew-redsocks2.git homebrew-redsocks2
       - mkdir -p build
       - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
       - cd build
       - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
       - brew bottle --merge --write ./${REDSOCKS_FORMULA_FILE}
-      # - git commit --message "Travis build $TRAVIS_BUILD_NUMBER"
+
+    - stage: build-high_sierra
+      <<: *run-high_sierra
+    - stage: build-sierra
+      <<: *run-sierra
+    - stage: build-el_capitan
+      <<: *run-el_capitan
+
+    - stage: bottleit-high_sierra
+      if: tag IS present
+      <<: *run-high_sierra
+      <<: *bottleit
+    - stage: bottleit-sierra
+      if: tag IS present
+      <<: *run-sierra
+      <<: *bottleit
+    - stage: bottleit-el_capitan
+      if: tag IS present
+      <<: *run-el_capitan
+      <<: *bottleit
+
+    - stage: print-workspace
+      script: ls -lahR .
+
     - stage: deploy
       if: tag IS present
       script: skip
