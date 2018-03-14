@@ -47,6 +47,7 @@ jobs:
     - stage: prepare-brew-formula
       env:
       - REDSOCKS_FORMULA_FILE=redsocks2.rb
+      before_install: skip
       script:
       - mkdir -p build
       - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
