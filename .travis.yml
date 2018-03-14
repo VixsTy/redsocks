@@ -30,8 +30,11 @@ anchors:
     - REDSOCKS_FORMULA_FILE=redsocks2.rb
   - &bottleit
     before_install:
+    - brew update
+    - brew install openssl
+    - brew install libevent
     # set up awscli packages
-    - pip install --user awscli
+    - brew install awscli
     - mkdir -p build
     - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
     script:
@@ -79,6 +82,11 @@ jobs:
       <<: *bottleit
 
     - stage: print-workspace
+      before_install:
+      # set up awscli packages
+      - pip install --user awscli
+      - mkdir -p build
+      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script: ls -lahR .
 
     - stage: deploy
