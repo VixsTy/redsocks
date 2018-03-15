@@ -92,6 +92,11 @@ jobs:
 
     - stage: deploy
       if: tag IS present
+      before_install:
+      # set up awscli packages
+      - pip install --user awscli
+      - mkdir -p build
+      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script: skip
       deploy:
         provider: releases
