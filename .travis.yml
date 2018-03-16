@@ -39,7 +39,8 @@ anchors:
     - cd build
     - ls -lahR .
     - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
-    - brew bottle --verbose --json --force-core-tap --root_url="\"https://github.com/VixsTy/redsocks/releases/download/${TRAVIS_TAG}\"" ./${REDSOCKS_FORMULA_FILE}
+    - sed -i '' '/root_url/d' ./${REDSOCKS_FORMULA_FILE}
+    - brew bottle --verbose --json --force-core-tap --root_url=https://github.com/VixsTy/redsocks/releases/download/${TRAVIS_TAG} ./${REDSOCKS_FORMULA_FILE}
     - brew bottle --merge --write --no-commit --keep-old redsocks2-${TRAVIS_TAG}.${BUILD_OS_VERSION}.bottle.json
     after_success:
     - aws s3 sync . s3://travis-redsocks/$TRAVIS_BUILD_NUMBER
