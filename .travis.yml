@@ -7,9 +7,6 @@ script:
 - make
 - make clean
 
-env:
-- REDSOCKS_FORMULA_FILE=redsocks2.rb
-
 anchors:
   - &run-high_sierra
     os: osx
