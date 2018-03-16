@@ -26,12 +26,6 @@ class Redsocks2 < Formula
       :using => GitNoDepthDownloadStrategy, :shallow => false
   end
 
-  bottle do
-    root_url "https://github.com/VixsTy/redsocks/releases/download/{{tags}}"
-    cellar :any
-  end
-
-
   depends_on "openssl"
   depends_on "libevent"
 
