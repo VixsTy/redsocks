@@ -39,7 +39,7 @@ anchors:
     <<: *awss3
     script:
     - cd build
-    - ls -lahR .
+    # - ls -lahR .
     - brew install --build-bottle ./${REDSOCKS_FORMULA_FILE}
     - sed -i '' '/root_url/d' ./${REDSOCKS_FORMULA_FILE}
     - brew bottle --verbose --json --force-core-tap --root_url=https://github.com/VixsTy/redsocks/releases/download/${TRAVIS_TAG} ./${REDSOCKS_FORMULA_FILE}
@@ -86,10 +86,10 @@ jobs:
       <<: *run-el_capitan
       <<: *bottleit
 
-    - stage: print-workspace
-      before_install:
-      <<: *awss3
-      script: ls -lahR .
+    # - stage: print-workspace
+    #   before_install:
+    #   <<: *awss3
+    #   script: ls -lahR .
 
     - stage: deploy
       if: tag IS present
@@ -102,7 +102,7 @@ jobs:
           secure: RLj2Mh5/HwuTozWHkrzQLiGJs/PfMPQgkoH7nuoD/1fm1AvpuAKbhHtok2r4x9yTJ8rnkU5yOEG6gu7akEJCV8C+Cmy/VpA1nZa1ZyWoUeA2PfiAu4Vmv3es53ZB0AS4E95mTcPo8J3w40MRaiZPauzK9h2kXS3Hmg7V16ULHHFAZK+CS+4Vr/WthmHbYZjxtK8XN2ahnMt49bGuOyBflJy6rknJ+1DsOtVTHjVUPY0upGLc8MQQmhNFIv2s8dtx3CuhsTomg7gtAfvAIks1CFGLmPCMhIkcQrn+cdHEUZ9G6pthAr8sOwHLlz1/3uj7F0F875RBMlsRh69maPTMipX5wELt73FfiGEuRRxftfc2rPGNw+jJi7G45lqxkFWeVenfrel5J5oXHmJxCsnYbkUozUfhJTq2OCZcjR54elX4q9UNFfR/ksmm67qE7MkqmlBHvp1ZySk/fwp8qBsFztGDsPE2o6ClMwZC8nvYdFgLSlzD3U+lN65p/hOitoeudV5rZ83Ul52VPjbIy3U1Jze6WkkqmzUDkcRWyUJVFMrsPTF1k/sEcsBhOvXULtFaZXFY7RKg5hNfki7R/fcykKVsvv+vtTzJ9DSa97d1L/B6ZrU2SbJ8ecxz0Z6SAWytvvvJ0qo4tayIT9/9Ka9KmM7WhIVbwIuv9mg6LPOQfUg=
         file_glob: true
         file:
-          - "build/*"
+        - "build/*"
         skip_cleanup: true
         on:
           tags: true
@@ -120,4 +120,4 @@ jobs:
       - git commit --message "Travis build ${TRAVIS_BUILD_NUMBER} set version to ${TRAVIS_TAG}" ${REDSOCKS_FORMULA_FILE}
       - git push https://${GH_TOKEN}@github.com/VixsTy/homebrew-redsocks2.git
       after_success:
-        - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER # clean up after ourselves
+      - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER # clean up after ourselves
