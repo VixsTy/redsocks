@@ -96,8 +96,6 @@ jobs:
       before_install:
       <<: *awss3
       script: skip
-      after_success:
-        - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER # clean up after ourselves
       deploy:
         provider: releases
         api_key:
@@ -108,3 +106,18 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
+
+    - stage: push formula
+      if: tag IS present
+      before_install:
+      <<: *awss3
+      script:
+      - git config --global user.email "travis@travis-ci.org"
+      - git config --global user.name "Travis CI"
+      - git clone https://${GH_TOKEN}@github.com/VixsTy/homebrew-redsocks2.git homebrew-redsocks2
+      - cp build/${REDSOCKS_FORMULA_FILE} homebrew-redsocks2/
+      - cd homebrew-redsocks2
+      - git commit --message "Travis build ${TRAVIS_BUILD_NUMBER} set version to ${TRAVIS_TAG}" ${REDSOCKS_FORMULA_FILE}
+      - git push https://${GH_TOKEN}@github.com/VixsTy/homebrew-redsocks2.git
+      after_success:
+        - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER # clean up after ourselves
