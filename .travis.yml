@@ -26,17 +26,15 @@ anchors:
     env:
     - BUILD_OS_VERSION=el_capitan
     - REDSOCKS_FORMULA_FILE=redsocks2.rb
-  - &awss3
-    # set up awscli packages
-    - brew install awscli
-    - mkdir -p build
-    - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
   - &bottleit
     before_install:
     - brew update
     - brew install openssl
     - brew install libevent
-    <<: *awss3
+    # set up awscli packages
+    - brew install awscli
+    - mkdir -p build
+    - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
     script:
     - cd build
     # - ls -lahR .
@@ -67,7 +65,10 @@ jobs:
       env:
       - REDSOCKS_FORMULA_FILE=redsocks2.rb
       before_install:
-      <<: *awss3
+      # set up awscli packages
+      - brew install awscli
+      - mkdir -p build
+      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script:
       - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
       after_success:
@@ -94,7 +95,10 @@ jobs:
     - stage: deploy
       if: tag IS present
       before_install:
-      <<: *awss3
+      # set up awscli packages
+      - brew install awscli
+      - mkdir -p build
+      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script: skip
       deploy:
         provider: releases
@@ -110,7 +114,10 @@ jobs:
     - stage: push formula
       if: tag IS present
       before_install:
-      <<: *awss3
+      # set up awscli packages
+      - brew install awscli
+      - mkdir -p build
+      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script:
       - git config --global user.email "travis@travis-ci.org"
       - git config --global user.name "Travis CI"
