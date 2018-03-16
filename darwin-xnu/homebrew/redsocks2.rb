@@ -26,6 +26,11 @@ class Redsocks2 < Formula
       :using => GitNoDepthDownloadStrategy, :shallow => false
   end
 
+  bottle do
+    cellar :any
+  end
+
+
   depends_on "openssl"
   depends_on "libevent"
 
