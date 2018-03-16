@@ -7,25 +7,25 @@ script:
 - make
 - make clean
 
+env:
+- REDSOCKS_FORMULA_FILE=redsocks2.rb
+
 anchors:
   - &run-high_sierra
     os: osx
     osx_image: xcode9.3beta
     env:
     - BUILD_OS_VERSION=high_sierra
-    - REDSOCKS_FORMULA_FILE=redsocks2.rb
   - &run-sierra
     os: osx
     osx_image: xcode9.2
     env:
     - BUILD_OS_VERSION=sierra
-    - REDSOCKS_FORMULA_FILE=redsocks2.rb
   - &run-el_capitan
     os: osx
     osx_image: xcode8
     env:
     - BUILD_OS_VERSION=el_capitan
-    - REDSOCKS_FORMULA_FILE=redsocks2.rb
   - &bottleit
     before_install:
     - brew update
@@ -42,6 +42,7 @@ anchors:
     - sed -i '' '/root_url/d' ./${REDSOCKS_FORMULA_FILE}
     - brew bottle --verbose --json --force-core-tap --root_url=https://github.com/VixsTy/redsocks/releases/download/${TRAVIS_TAG} ./${REDSOCKS_FORMULA_FILE}
     - brew bottle --merge --write --no-commit --keep-old redsocks2-${TRAVIS_TAG}.${BUILD_OS_VERSION}.bottle.json
+    - rm redsocks2-${TRAVIS_TAG}.${BUILD_OS_VERSION}.bottle.json
     after_success:
     - aws s3 sync . s3://travis-redsocks/$TRAVIS_BUILD_NUMBER
 
@@ -62,15 +63,13 @@ jobs:
 
     - stage: prepare-brew-formula
       if: tag IS present
-      env:
-      - REDSOCKS_FORMULA_FILE=redsocks2.rb
       before_install:
       # set up awscli packages
       - pip install --user awscli
       - mkdir -p build
       - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script:
-      - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
+      - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/${REDSOCKS_FORMULA_FILE} > build/${REDSOCKS_FORMULA_FILE}
       after_success:
       - aws s3 sync build/ s3://travis-redsocks/$TRAVIS_BUILD_NUMBER
 
