@@ -66,7 +66,7 @@ jobs:
       - REDSOCKS_FORMULA_FILE=redsocks2.rb
       before_install:
       # set up awscli packages
-      - brew install awscli
+      - pip install --user awscli
       - mkdir -p build
       - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script:
@@ -96,7 +96,7 @@ jobs:
       if: tag IS present
       before_install:
       # set up awscli packages
-      - brew install awscli
+      - pip install --user awscli
       - mkdir -p build
       - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script: skip
@@ -115,7 +115,7 @@ jobs:
       if: tag IS present
       before_install:
       # set up awscli packages
-      - brew install awscli
+      - pip install --user awscli
       - mkdir -p build
       - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
       script:
