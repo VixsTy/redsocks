@@ -31,7 +31,6 @@ class Redsocks2 < Formula
     cellar :any
   end
 
-
   depends_on "openssl"
   depends_on "libevent"
 

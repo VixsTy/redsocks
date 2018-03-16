@@ -26,15 +26,17 @@ anchors:
     env:
     - BUILD_OS_VERSION=el_capitan
     - REDSOCKS_FORMULA_FILE=redsocks2.rb
+  - &awss3
+    # set up awscli packages
+    - brew install awscli
+    - mkdir -p build
+    - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
   - &bottleit
     before_install:
     - brew update
     - brew install openssl
     - brew install libevent
-    # set up awscli packages
-    - brew install awscli
-    - mkdir -p build
-    - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
+    <<: *awss3
     script:
     - cd build
     - ls -lahR .
@@ -47,25 +49,25 @@ anchors:
 
 jobs:
   include:
-    # - stage: build
-    #   language: c
-    #   <<: *run-high_sierra
-    # - stage: build
-    #   language: c
-    #   <<: *run-sierra
-    # - stage: build
-    #   language: c
-    #   <<: *run-el_capitan
+    - stage: build
+      if: tag IS blank
+      language: c
+      <<: *run-high_sierra
+    - stage: build
+      language: c
+      if: tag IS blank
+      <<: *run-sierra
+    - stage: build
+      if: tag IS blank
+      language: c
+      <<: *run-el_capitan
 
     - stage: prepare-brew-formula
       if: tag IS present
       env:
       - REDSOCKS_FORMULA_FILE=redsocks2.rb
       before_install:
-      # set up awscli packages
-      - pip install --user awscli
-      - mkdir -p build
-      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
+      <<: *awss3
       script:
       - sed 's|{{tags}}|'${TRAVIS_TAG}'|' darwin-xnu/homebrew/redsocks2.rb > build/${REDSOCKS_FORMULA_FILE}
       after_success:
@@ -86,20 +88,16 @@ jobs:
 
     - stage: print-workspace
       before_install:
-      # set up awscli packages
-      - pip install --user awscli
-      - mkdir -p build
-      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
+      <<: *awss3
       script: ls -lahR .
 
     - stage: deploy
       if: tag IS present
       before_install:
-      # set up awscli packages
-      - pip install --user awscli
-      - mkdir -p build
-      - aws s3 sync s3://travis-redsocks/$TRAVIS_BUILD_NUMBER build/
+      <<: *awss3
       script: skip
+      after_success:
+        - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER # clean up after ourselves
       deploy:
         provider: releases
         api_key:
