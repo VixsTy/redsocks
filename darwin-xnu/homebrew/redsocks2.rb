@@ -27,6 +27,7 @@ class Redsocks2 < Formula
   end
 
   bottle do
+    root_url "https://github.com/VixsTy/redsocks/releases/download/{{tags}}"
     cellar :any
   end
 
