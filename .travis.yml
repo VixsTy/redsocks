@@ -8,9 +8,14 @@ script:
 - make clean
 
 anchors:
+  - &run-mojave
+    os: osx
+    osx_image: xcode11
+    env:
+    - BUILD_OS_VERSION=mojave
   - &run-high_sierra
     os: osx
-    osx_image: xcode9.3beta
+    osx_image: xcode10.1
     env:
     - BUILD_OS_VERSION=high_sierra
   - &run-sierra
@@ -48,6 +53,10 @@ jobs:
     - stage: build
       if: tag IS blank
       language: c
+      <<: *run-mojave
+    - stage: build
+      if: tag IS blank
+      language: c
       <<: *run-high_sierra
     - stage: build
       language: c
@@ -70,6 +79,10 @@ jobs:
       after_success:
       - aws s3 sync build/ s3://travis-redsocks/$TRAVIS_BUILD_NUMBER
 
+    - stage: bottleit-mojave
+      if: tag IS present
+      <<: *run-mojave
+      <<: *bottleit
     - stage: bottleit-high_sierra
       if: tag IS present
       <<: *run-high_sierra
